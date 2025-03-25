@@ -52,21 +52,38 @@ canvas.addEventListener("mouseup", ({ clientX, clientY }) => {
     isPainting = false
 })
 
-canvas.addEventListener("touchmove", (e) => {
-    isPainting = true
-    const touch = e.touches[0]
-    const { clientX, clientY} = touch
+canvas.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    isPainting = true;
+    const touch = e.touches[0];
+    const { clientX, clientY } = touch;
     if (activeTool == "brush") {
-        draw(clientX, clientY)
+        draw(clientX, clientY);
     }
     if (activeTool == "rubber") {
-        erase(clientX, clientY)
+        erase(clientX, clientY);
     }
-})
+});
+
+canvas.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const { clientX, clientY } = touch;
+    if (isPainting) {
+        if (activeTool == "brush") {
+            draw(clientX, clientY);
+        }
+        if (activeTool == "rubber") {
+            erase(clientX, clientY);
+        }
+    }
+});
 
 canvas.addEventListener("touchend", () => {
-    
-})
+    isPainting = false;
+});
+
+
 
 const draw = (x, y) => {
     ctx.globalCompositeOperation = "source-over"
@@ -125,3 +142,12 @@ sizeButtons.forEach((button) => {
 buttonClear.addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 })
+
+const buttonSave = document.getElementById("button__save");
+
+buttonSave.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = "drawing.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+});
