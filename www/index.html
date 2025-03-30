@@ -1,87 +1,38 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
-        <meta
-            http-equiv="Content-Security-Policy"
-            content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'"
-        />
-        <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0"
-        />
-        <script src="cordova.js"></script>
-        <script src="components/loader.js"></script>
-        <link rel="stylesheet" href="components/loader.css" />
-        <link rel="stylesheet" href="css/style.css" />
-        <script></script>
-    </head>
-    <body>
-        <section class="container">
-            <canvas width="900" height="600"></canvas>
 
-            <div>
-                <section class="tool-box">
-                    <button class="button__tool active" data-action="brush">
-                        <span class="material-symbols-outlined">brush</span>
-                    </button>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0" />
+    <script src="cordova.js"></script>
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script></script>
+</head>
 
-                    <button class="button__tool" data-action="rubber">
-                        <span class="material-symbols-outlined"
-                            >ink_eraser</span
-                        >
-                    </button>
+<body>
+    <h1 style="position: fixed; top: 10px; left: 10px; z-index: 1000; color: #f1f1f1;">
+        Paint Ultra Mega
 
-                    <button class="button__tool">
-                        <input type="color" class="input__color" />
-                    </button>
-                </section>
+        <span class="material-symbols-outlined" style="color: red;">local_fire_department</span>
+        <span class="material-symbols-outlined">brush</span>
+    </h1>
+    <div class="container">
+        <canvas id="drawCanvas"></canvas>
+        <div class="controls">
+            <button id="clearBtn">Limpar</button>
+            <input type="color" id="colorPicker" value="#000000">
+            <input type="range" id="thicknessSlider" min="1" max="50" value="5">
+            <button id="saveBtn">Salvar</button>
+        </div>
+    </div>
 
-                <section class="tool-box">
-                    <button class="button__size" data-size="5">
-                        <span class="stroke"></span>
-                    </button>
+    <script src="./script.js"></script>
+</body>
 
-                    <button class="button__size" data-size="10">
-                        <span class="stroke"></span>
-                    </button>
-
-                    <button class="button__size active" data-size="20">
-                        <span class="stroke"></span>
-                    </button>
-
-                    <button class="button__size" data-size="30">
-                        <span class="stroke"></span>
-                    </button>
-
-                    <button class="button__size" data-size="50">
-                        <span class="stroke"></span>
-                    </button>
-                </section>
-
-                <section class="tool-box">
-                    <button class="button__tool button__clear">
-                        <span class="material-symbols-outlined">Delete</span>
-                    </button>
-                </section>
-
-                <section class="tool-box">
-                    <button id="button__save" class="button__tool">
-                        <span class="material-symbols-outlined">save</span>
-                    </button>
-                </section>
-            </div>
-        </section>
-
-        <script>
-            document.addEventListener('click', (e)=> {
-                console.log(e)
-            })
-        </script>
-        <script src="./script.js"></script>
-    </body>
 </html>

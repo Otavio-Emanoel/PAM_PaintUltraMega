@@ -1,153 +1,98 @@
-const canvas = document.querySelector("canvas")
-const ctx = canvas.getContext("2d")
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
+const clearBtn = document.getElementById('clearBtn');
+const colorPicker = document.getElementById('colorPicker');
+const thicknessSlider = document.getElementById('thicknessSlider');
+const saveBtn = document.getElementById('saveBtn');
 
-const inputColor = document.querySelector(".input__color")
-const tools = document.querySelectorAll(".button__tool")
-const sizeButtons = document.querySelectorAll(".button__size")
-const buttonClear = document.querySelector(".button__clear")
+// Configuração inicial do canvas
+function initializeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = 400;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = colorPicker.value;
+    ctx.lineWidth = thicknessSlider.value;
+}
 
-let brushSize = 20
+initializeCanvas();
 
-let isPainting = false
+// Eventos de toque para desenho
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
 
-let activeTool = "brush"
+canvas.addEventListener('touchstart', startDrawing);
+canvas.addEventListener('touchmove', draw);
+canvas.addEventListener('touchend', stopDrawing);
 
-canvas.addEventListener('touchstart', function(e) {
-    e.preventDefault()   
-})
+// Eventos de mouse para desktop
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseout', stopDrawing);
 
-canvas.addEventListener('touchend', function(e) {
-    e.preventDefault()   
-})
+function startDrawing(e) {
+    isDrawing = true;
+    [lastX, lastY] = getCoordinates(e);
+}
 
-inputColor.addEventListener("change", ({ target }) => {
-    ctx.fillStyle = target.value
-})
+function draw(e) {
+    if (!isDrawing) return;
+    const x = getCoordinates(e)[0];
+    const y = getCoordinates(e)[1];
+    
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    
+    [lastX, lastY] = [x, y];
+}
 
-canvas.addEventListener("mousedown", ({ clientX, clientY }) => {
-    isPainting = true
+function stopDrawing() {
+    isDrawing = false;
+}
 
-    if (activeTool == "brush") {
-        draw(clientX, clientY)
+function getCoordinates(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    if (e.type === 'touchmove' || e.type === 'touchstart') {
+        const touch = e.touches[0];
+        return [
+            (touch.clientX - rect.left) * scaleX,
+            (touch.clientY - rect.top) * scaleY
+        ];
+    } else {
+        return [
+            (e.clientX - rect.left) * scaleX,
+            (e.clientY - rect.top) * scaleY
+        ];
     }
+}
 
-    if (activeTool == "rubber") {
-        erase(clientX, clientY)
-    }
-})
-
-canvas.addEventListener("mousemove", ({ clientX, clientY }) => {
-    if (isPainting) {
-        if (activeTool == "brush") {
-            draw(clientX, clientY)
-        }
-
-        if (activeTool == "rubber") {
-            erase(clientX, clientY)
-        }
-    }
-})
-
-canvas.addEventListener("mouseup", ({ clientX, clientY }) => {
-    isPainting = false
-})
-
-canvas.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    isPainting = true;
-    const touch = e.touches[0];
-    const { clientX, clientY } = touch;
-    if (activeTool == "brush") {
-        draw(clientX, clientY);
-    }
-    if (activeTool == "rubber") {
-        erase(clientX, clientY);
-    }
+// Controles
+clearBtn.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
 
-canvas.addEventListener("touchmove", (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const { clientX, clientY } = touch;
-    if (isPainting) {
-        if (activeTool == "brush") {
-            draw(clientX, clientY);
-        }
-        if (activeTool == "rubber") {
-            erase(clientX, clientY);
-        }
-    }
+colorPicker.addEventListener('input', () => {
+    ctx.strokeStyle = colorPicker.value;
 });
 
-canvas.addEventListener("touchend", () => {
-    isPainting = false;
+thicknessSlider.addEventListener('input', () => {
+    ctx.lineWidth = thicknessSlider.value;
 });
 
-
-
-const draw = (x, y) => {
-    ctx.globalCompositeOperation = "source-over"
-    ctx.beginPath()
-    ctx.arc(
-        x - canvas.offsetLeft,
-        y - canvas.offsetTop,
-        brushSize / 2,
-        0,
-        2 * Math.PI
-    )
-    ctx.fill()
-}
-
-const erase = (x, y) => {
-    ctx.globalCompositeOperation = "destination-out"
-    ctx.beginPath()
-    ctx.arc(
-        x - canvas.offsetLeft,
-        y - canvas.offsetTop,
-        brushSize / 2,
-        0,
-        2 * Math.PI
-    )
-    ctx.fill()
-}
-
-const selectTool = ({ target }) => {
-    const selectedTool = target.closest("button")
-    const action = selectedTool.getAttribute("data-action")
-
-    if (action) {
-        tools.forEach((tool) => tool.classList.remove("active"))
-        selectedTool.classList.add("active")
-        activeTool = action
-    }
-}
-
-const selectSize = ({ target }) => {
-    const selectedTool = target.closest("button")
-    const size = selectedTool.getAttribute("data-size")
-
-    sizeButtons.forEach((tool) => tool.classList.remove("active"))
-    selectedTool.classList.add("active")
-    brushSize = size
-}
-
-tools.forEach((tool) => {
-    tool.addEventListener("click", selectTool)
-})
-
-sizeButtons.forEach((button) => {
-    button.addEventListener("click", selectSize)
-})
-
-buttonClear.addEventListener("click", () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-})
-
-const buttonSave = document.getElementById("button__save");
-
-buttonSave.addEventListener("click", () => {
-    const link = document.createElement("a");
-    link.download = "drawing.png";
-    link.href = canvas.toDataURL("image/png");
+saveBtn.addEventListener('click', () => {
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = 'desenho.png';
+    link.href = dataUrl;
     link.click();
 });
+
+// Redimensionamento do canvas
+window.addEventListener('resize', initializeCanvas);
