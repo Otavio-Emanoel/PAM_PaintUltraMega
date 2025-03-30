@@ -86,47 +86,13 @@ thicknessSlider.addEventListener('input', () => {
     ctx.lineWidth = thicknessSlider.value;
 });
 
-// Função para salvar a imagem
-saveBtn.addEventListener('click', async () => {
-    try {
-        // Obtém os dados da imagem do canvas
-        const dataUrl = canvas.toDataURL('image/png');
-        
-        // Converte a imagem para um objeto Blob
-        const blob = await convertDataUrlToBlob(dataUrl);
-        
-        // Configura o caminho para salvar no dispositivo
-        const filePath = `${ cordova.file.externalRootDirectory }/desenho.png`;
-        
-        // Salva o arquivo no dispositivo
-        window.resolveLocalFileSystemURL(filePath, 
-            (fileEntry) => {
-                fileEntry.createWriter((fileWriter) => {
-                    fileWriter.write(blob);
-                    alert('Imagem salva com sucesso no dispositivo!');
-                }, 
-                (error) => {
-                    console.error('Erro ao salvar arquivo:', error);
-                    alert('Erro ao salvar a imagem. Tente novamente.');
-                });
-            }, 
-            (error) => {
-                console.error('Erro ao acessar o sistema de arquivos:', error);
-                alert('Erro ao acessar o armazenamento do dispositivo.');
-            }
-        );
-    } catch (error) {
-        console.error('Erro ao salvar a imagem:', error);
-        alert('Erro ao salvar a imagem. Tente novamente.');
-    }
+saveBtn.addEventListener('click', () => {
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = 'desenho.png';
+    link.href = dataUrl;
+    link.click();
 });
-
-// Função auxiliar para converter dataURL para Blob
-async function convertDataUrlToBlob(dataUrl) {
-    const response = await fetch(dataUrl);
-    const blob = await response.blob();
-    return blob;
-}
 
 // Redimensionamento do canvas
 window.addEventListener('resize', initializeCanvas);
